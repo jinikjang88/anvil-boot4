@@ -116,7 +116,9 @@ anvil-boot4/
 - AWS 의존성은 LocalStack 사용
 
 ## 작업 규칙 (클로드 코드용)
-- 새 챕터 생성 시 동일 구조 복제 (`chapters/chXX-*/{backend,frontend}` + README 8섹션)
+- **MUST — 사용하지 않는 코드는 즉시 제거한다.** 새 작업이든 기존 작업이든, dead import / 미사용 변수 / 호출되지 않는 메서드 / 주석 처리한 코드 / placeholder TODO 잔재는 발견 즉시 삭제. 스파게티 소스 방지의 최우선 규칙. (실수로 지운 게 아닌지 의심되면 삭제 전 확인.)
+- **MUST — 챕터는 on-demand 생성.** 16챕터를 빈 모듈로 미리 깔지 않는다. 챕터 작업을 시작할 때만 `scripts/new-chapter.sh` 로 `chapters/chXX-*/{README.md, backend/, frontend/}` 를 한 번에 스캐폴딩한다. 빈 디렉터리 / 빈 build.gradle.kts 는 금지.
+- 새 챕터 생성: `./scripts/new-chapter.sh <id> <slug> "<title>"` (예: `./scripts/new-chapter.sh 01 foundation "Spring Boot 4의 세계"`)
 - 라이브러리 버전 추가는 반드시 `gradle/libs.versions.toml` 에 등록 후 참조
 - 커밋 메시지는 Conventional Commits + 챕터 prefix: `feat(ch03): JPA 영속성 컨텍스트 예제 추가`
 - 큰 변경 전에는 계획을 먼저 제시하고 승인 대기
