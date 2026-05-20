@@ -20,12 +20,13 @@ dependencyResolutionManagement {
 
 rootProject.name = "anvil-boot4"
 
-// chapters/ 하위 디렉터리 중 build.gradle.kts 가 있는 모듈을 자동 include
-// 챕터 간 의존 금지 원칙을 지키기 위해 평탄한 include 구조를 사용한다.
+// chapters/chXX-*/backend/build.gradle.kts 를 가진 모듈만 Gradle 에 포함시킨다.
+// frontend/ 는 정적 자산이므로 빌드 대상이 아니다.
+// 모듈 경로는 `:chapters:chXX-<topic>` 으로 평탄화하여 챕터 간 의존 금지 원칙을 유지한다.
 file("chapters").listFiles()
-    ?.filter { it.isDirectory && File(it, "build.gradle.kts").exists() }
+    ?.filter { it.isDirectory && File(it, "backend/build.gradle.kts").exists() }
     ?.forEach { dir ->
         val name = dir.name
         include(":chapters:$name")
-        project(":chapters:$name").projectDir = dir
+        project(":chapters:$name").projectDir = File(dir, "backend")
     }
