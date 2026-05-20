@@ -1,0 +1,36 @@
+[versions]
+# JVM / 빌드
+java = "25"
+springBoot = "4.0.0"
+springDependencyManagement = "1.1.7"
+foojayResolver = "0.10.0"
+
+# 테스트
+junit = "5.11.4"
+assertj = "3.26.3"
+testcontainers = "1.21.3"
+
+# 인프라
+postgresql = "42.7.4"
+
+[libraries]
+# Spring Boot 의존성 (버전은 Boot BOM 이 관리하므로 명시하지 않음)
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+# 테스트
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+testcontainers-bom = { module = "org.testcontainers:testcontainers-bom", version.ref = "testcontainers" }
+testcontainers-junit = { module = "org.testcontainers:junit-jupiter" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql" }
+
+# 드라이버
+postgresql-driver = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+foojay-resolver-convention = { id = "org.gradle.toolchains.foojay-resolver-convention", version.ref = "foojayResolver" }
