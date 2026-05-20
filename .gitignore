@@ -28,7 +28,6 @@ Thumbs.db
 # 환경/시크릿
 .env
 .env.local
-*.local.yml
 application-local-secret.yml
 
 # 로그

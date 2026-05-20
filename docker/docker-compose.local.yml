@@ -1,0 +1,81 @@
+# 로컬 학습용 인프라 일괄 기동
+#
+# 사용:
+#   docker compose -f docker/docker-compose.local.yml up -d        # 기동
+#   docker compose -f docker/docker-compose.local.yml ps           # 상태
+#   docker compose -f docker/docker-compose.local.yml logs -f      # 로그
+#   docker compose -f docker/docker-compose.local.yml down -v      # 정리 (볼륨 포함)
+#
+# 비표준 포트를 사용한다 — 호스트의 기본 설치본(Postgres 5432, Redis 6379, LocalStack 4566)과
+# 충돌하지 않도록 의도적으로 한 칸씩 옮겼다. 챕터의 application-local.yml 도 동일 포트를 가리킨다.
+
+name: anvil-boot4-local
+
+services:
+  # ── PostgreSQL 16 ────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: anvil-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: anvil
+      POSTGRES_PASSWORD: anvil
+      POSTGRES_DB: anvil
+      # 한글 데이터를 다루므로 UTF-8 고정
+      LANG: ko_KR.UTF-8
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    ports:
+      - "5433:5432"   # host:container — 호스트 5432 와 충돌 방지
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anvil -d anvil"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── Redis 7 ──────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: anvil-redis
+    restart: unless-stopped
+    # appendonly: 학습 중 데이터 유지. 캐시 시나리오 디버깅에 유리.
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── LocalStack (AWS 에뮬레이션) ─────────────────────────────────
+  # ch15-observability / ch16-deploy / 기타 AWS 의존 챕터에서 사용.
+  localstack:
+    image: localstack/localstack:3
+    container_name: anvil-localstack
+    restart: unless-stopped
+    environment:
+      SERVICES: s3,sqs,sns,dynamodb
+      DEFAULT_REGION: ap-northeast-2
+      AWS_DEFAULT_REGION: ap-northeast-2
+      # 로컬 학습이므로 영구 저장 켬 — 컨테이너 재시작해도 버킷/큐 유지
+      PERSISTENCE: "1"
+      DEBUG: "0"
+    ports:
+      - "4567:4566"   # edge port (LocalStack 통합 게이트웨이)
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+  redis-data:
+  localstack-data:
