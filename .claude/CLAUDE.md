@@ -65,7 +65,12 @@ anvil-boot4/
 
 ### Part 3. 데이터 계층 (담금질)
 - ch08-jpa               — JPA 한입에, 영속성 컨텍스트
-- ch09-querydsl          — QueryDSL, 동적 쿼리
+- ch09-querydsl          — QueryDSL, 동적 쿼리 (타입 세이프 ORM 위의 DSL)
+- ch09b-jooq             — jOOQ, SQL-First 비교 세부챕터
+  - JPA/QueryDSL(ORM-First) ↔ jOOQ(SQL-First) 패러다임 차이
+  - 동일 도메인을 세 방식으로 구현 → 코드/쿼리/성능/유지보수 관점 비교표
+  - 언제 jOOQ 를 골라야 하는가 (복잡한 집계, 윈도우 함수, 벤더별 SQL, 코드 생성 워크플로)
+  - War Story: ORM N+1 / fetch join 한계로 결국 native query 산발 → jOOQ 로 통일한 사례
 - ch10-transaction       — 트랜잭션, 격리/전파/AOP 함정
 
 ### Part 4. 확장 (벼림의 정수)
