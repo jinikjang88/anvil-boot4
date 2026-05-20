@@ -1,0 +1,45 @@
+# 빌드 산출물
+**/build/
+**/out/
+**/.gradle/
+**/bin/
+
+# IDE
+**/.idea/
+**/.vscode/
+**/*.iml
+**/.DS_Store
+
+# 의존성
+**/node_modules/
+**/.pnpm-store/
+
+# 로그/임시
+**/logs/
+**/*.log
+**/tmp/
+**/.cache/
+
+# 환경
+**/.env
+**/.env.*
+!**/.env.example
+
+# 테스트 산출물
+**/test-results/
+**/coverage/
+**/jacoco/
+**/.testcontainers/
+
+# 도커 볼륨
+**/docker/data/
+**/docker/volumes/
+
+# OS
+Thumbs.db
+
+# 큰 바이너리/문서
+**/*.pdf
+**/*.zip
+**/*.tar.gz
+**/dump/
