@@ -65,16 +65,22 @@ curl "http://localhost:8080/api/hello?name=%EC%9E%A5%EC%A7%84%EC%9D%B5"
 
 ## 5. 시각화 (See)
 
-`frontend/index.html` — Tailwind Play CDN + 오행 팔레트가 적용된 정적 데모 페이지.
-별도 빌드 없이 열린다:
+`frontend/index.html` — Tailwind Play CDN + 오행 팔레트로 만든 데모 카드.
+이름 입력 → `호출` → `fetch('http://localhost:8080/api/hello')` → JSON 결과 표시.
+오행 컬러로 상태 구분: **木**(녹) = 성공, **火**(적) = 에러, **金**(회) = 대기.
 
 ```bash
-python3 -m http.server 5173 --directory chapters/ch01-foundation/frontend
-# → http://localhost:5173
+# 두 개 터미널 또는 백그라운드:
+./gradlew :chapters:ch01-foundation:bootRun          # 1) 백엔드 (8080)
+python3 -m http.server 5173 \
+  --directory chapters/ch01-foundation/frontend       # 2) 프론트 (5173)
+
+# 브라우저: http://localhost:5173
 ```
 
-> 챕터 진행이 끝나면 fetch 로 `/api/hello` 를 호출해 화면에 결과를 띄우는 데모가
-> 여기에 들어간다. (현 시점은 인사 카드 placeholder 만 있는 상태)
+> 백엔드가 8080 이 아닌 다른 포트라면 `frontend/script.js` 의 `API` 상수만 바꾸면 된다.
+> CORS 는 `LocalDevCorsConfig` 가 `local` 프로필일 때만 5173 origin 을 허용한다 —
+> 실 운영 보안은 ch07-security 에서 본격적으로 다룸.
 
 ## 6. 실무 체크리스트 (ISMS-P / 성능 / 보안)
 
