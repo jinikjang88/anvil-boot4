@@ -1,0 +1,24 @@
+/* 오행 팔레트 — 대장간 + 사주 브랜드 통합 */
+:root {
+  --anvil-bg:      #F5EFE0; /* 土 — 베이지 배경 */
+  --anvil-accent:  #C0392B; /* 火 — 강조/경고 */
+  --anvil-data:    #1E5F8C; /* 水 — 데이터/링크 */
+  --anvil-success: #3B7A57; /* 木 — 성공/긍정 */
+  --anvil-muted:   #7F8C8D; /* 金 — 보조 텍스트 */
+  --anvil-fg:      #2C2C2C;
+}
+
+body {
+  background-color: var(--anvil-bg);
+  color: var(--anvil-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+               "Segoe UI", Roboto, sans-serif;
+}
+
+.text-anvil-accent  { color: var(--anvil-accent); }
+.text-anvil-data    { color: var(--anvil-data); }
+.text-anvil-success { color: var(--anvil-success); }
+.text-anvil-muted   { color: var(--anvil-muted); }
+.bg-anvil-accent    { background-color: var(--anvil-accent); }
+.bg-anvil-data      { background-color: var(--anvil-data); }
+.border-anvil-muted { border-color: var(--anvil-muted); }

@@ -28,4 +28,6 @@ dependencies {
 
     // 테스트는 Spring Boot Test 스타터로 전환 (anvil.java-conventions 의 JUnit 위에 덧붙음)
     "testImplementation"(libs.spring.boot.starter.test)
+    // Boot 4 에서 WebMvcTest / @AutoConfigureMockMvc 슬라이스 테스트는 별도 모듈
+    "testImplementation"(libs.spring.boot.webmvc.test)
 }
