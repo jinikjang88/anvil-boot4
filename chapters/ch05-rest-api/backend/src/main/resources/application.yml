@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: ch05-rest-api
+  profiles:
+    active: local
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
