@@ -1,0 +1,30 @@
+/* 오행 팔레트 — 본 페이지가 실제 사용하는 토큰만 정의. */
+:root {
+  --anvil-bg:      #F5EFE0; /* 土 */
+  --anvil-accent:  #C0392B; /* 火 — 강조/뱃지/에러/차단 표시 */
+  --anvil-data:    #1E5F8C; /* 水 — 링크/추적 버튼 */
+  --anvil-success: #3B7A57; /* 木 — 활성 프로파일 컬럼 강조/성공 응답 */
+  --anvil-muted:   #7F8C8D; /* 金 — 보조 텍스트/테두리 */
+  --anvil-fg:      #2C2C2C;
+}
+
+body {
+  background-color: var(--anvil-bg);
+  color: var(--anvil-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+               "Segoe UI", Roboto, sans-serif;
+}
+
+.text-anvil-accent  { color: var(--anvil-accent); }
+.text-anvil-data    { color: var(--anvil-data); }
+.text-anvil-success { color: var(--anvil-success); }
+.text-anvil-muted   { color: var(--anvil-muted); }
+.bg-anvil-accent    { background-color: var(--anvil-accent); }
+.border-anvil-muted { border-color: var(--anvil-muted); }
+
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}

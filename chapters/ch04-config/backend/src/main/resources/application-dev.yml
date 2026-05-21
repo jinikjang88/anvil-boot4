@@ -1,0 +1,10 @@
+anvil:
+  environment-label: "개발 서버 (dev)"
+  rate-limit:
+    max-per-minute: 100
+    window-seconds: 60
+  sender:
+    base-url: "https://sandbox-api.anvil.dev"
+
+# dev 에서는 환경변수로 시크릿을 주입한다고 가정 — yml 에는 시크릿 두지 않는다.
+# 예: SPRING_APPLICATION_JSON='{"anvil.sender.api-key":"dev-key"}'

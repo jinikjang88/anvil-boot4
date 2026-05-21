@@ -1,0 +1,13 @@
+spring:
+  config:
+    # 시크릿 파일을 별도 import. git 미커밋(.gitignore 차단).
+    # optional: 접두사 덕에 파일이 없어도 부팅이 실패하지 않는다 — .example 만 보고 처음 보는 학습자도 일단 뜬다.
+    import: "optional:classpath:application-local-secret.yml"
+
+anvil:
+  environment-label: "로컬 (개발)"
+  rate-limit:
+    max-per-minute: -1     # 로컬은 무제한 — 디버깅 편의
+    window-seconds: 60
+  sender:
+    base-url: "http://localhost:9999/mock-sender"

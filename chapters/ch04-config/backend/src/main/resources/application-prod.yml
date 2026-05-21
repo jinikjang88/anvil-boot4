@@ -1,0 +1,17 @@
+anvil:
+  environment-label: "운영 (prod)"
+  rate-limit:
+    max-per-minute: 10
+    window-seconds: 60
+  sender:
+    base-url: "https://api.anvil.run"
+
+# prod 의 시크릿은 Secrets Manager / KMS / IAM Role 등을 통해 주입.
+# yml 에는 시크릿을 *절대* 두지 않는다.
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # prod 에서는 env 노출하지 않음 — 환경변수 / 빈 값 등 내부 정보 누출 방지
+        include: health,info

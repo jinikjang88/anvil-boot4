@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: ch04-config
+  profiles:
+    # 기본 활성 프로파일. JVM 인자 / 환경변수로 덮어쓰기 가능:
+    #   SPRING_PROFILES_ACTIVE=dev ./gradlew bootRun
+    #   ./gradlew bootRun --args='--spring.profiles.active=prod'
+    active: local
+
+server:
+  port: 8080
+
+# ─── 공통 + 기본값 ──────────────────────────────────────────────────────
+# 각 application-{profile}.yml 이 필요한 키만 오버라이드한다.
+# kebab-case 가 yml 의 권장 표기 — Spring 이 camelCase / snake_case 와 호환 변환한다.
+anvil:
+  name: anvil-boot4
+  version: 0.4.0
+  environment-label: "default"
+  rate-limit:
+    max-per-minute: 60      # -1 = 무제한 (학습용 컨벤션)
+    window-seconds: 60
+  sender:
+    base-url: "https://api.example.invalid"
+    # 진짜 키는 절대 여기 두지 않는다 — application-local-secret.yml / 환경변수 / Secrets Manager
+    api-key: "PLACEHOLDER-set-via-secret-file-or-env"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env
