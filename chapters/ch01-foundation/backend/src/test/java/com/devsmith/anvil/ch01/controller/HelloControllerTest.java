@@ -42,11 +42,11 @@ class HelloControllerTest {
     @Test
     void name_쿼리파라미터를_주면_서비스에_전달된다() throws Exception {
         // given
-        when(helloService.greet("장진익")).thenReturn("hello, 장진익");
+        when(helloService.greet("홍길동")).thenReturn("hello, 홍길동");
 
         // when & then
-        mockMvc.perform(get("/api/hello").param("name", "장진익"))
+        mockMvc.perform(get("/api/hello").param("name", "홍길동"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.message").value("hello, 장진익"));
+               .andExpect(jsonPath("$.message").value("hello, 홍길동"));
     }
 }

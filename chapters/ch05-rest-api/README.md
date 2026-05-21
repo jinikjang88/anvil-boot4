@@ -14,7 +14,7 @@
 
 ## 2. 진짜 현장 이야기 (War Story)
 
-베민 / 금융 메시징을 거치며 본 어색한 URL 들:
+여러 운영 백엔드 코드베이스에서 마주친 어색한 URL 들:
 
 - `POST /api/v1/order/list/get` — POST 로 목록을 GET 함 (메서드와 URL 둘 다 동사)
 - `GET  /api/v1/getUserById?id=42` — GET 인데 동사가 또 들어감

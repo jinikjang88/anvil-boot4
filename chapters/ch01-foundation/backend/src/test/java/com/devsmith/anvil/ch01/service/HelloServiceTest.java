@@ -17,13 +17,13 @@ class HelloServiceTest {
     @Test
     void 이름이_주어지면_그_이름으로_인사한다() {
         // given
-        String name = "장진익";
+        String name = "홍길동";
 
         // when
         String result = helloService.greet(name);
 
         // then
-        assertThat(result).isEqualTo("hello, 장진익");
+        assertThat(result).isEqualTo("hello, 홍길동");
     }
 
     @Test
@@ -53,12 +53,12 @@ class HelloServiceTest {
     @Test
     void 이름_앞뒤_공백은_제거되어_인사한다() {
         // given
-        String name = "  장진익  ";
+        String name = "  홍길동  ";
 
         // when
         String result = helloService.greet(name);
 
         // then
-        assertThat(result).isEqualTo("hello, 장진익");
+        assertThat(result).isEqualTo("hello, 홍길동");
     }
 }

@@ -45,8 +45,8 @@ Boot **3 → 4** 의 함정은 조금 다르다. 패키지 이동(`spring-boot-t
 curl http://localhost:8080/api/hello
 # → {"message":"hello, anvil"}
 
-curl "http://localhost:8080/api/hello?name=%EC%9E%A5%EC%A7%84%EC%9D%B5"
-# → {"message":"hello, 장진익"}
+curl "http://localhost:8080/api/hello?name=%ED%99%8D%EA%B8%B8%EB%8F%99"
+# → {"message":"hello, 홍길동"}
 #
 # 한글 파라미터는 반드시 URL 인코딩 — 인코딩 안 하면 Tomcat 이 400 으로 끊는다.
 

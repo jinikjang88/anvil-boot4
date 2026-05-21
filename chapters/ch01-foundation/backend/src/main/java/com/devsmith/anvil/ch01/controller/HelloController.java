@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
  * ch01 의 단일 엔드포인트:
  * <pre>
  *   GET /api/hello              → { "message": "hello, anvil" }
- *   GET /api/hello?name=장진익  → { "message": "hello, 장진익" }
+ *   GET /api/hello?name=홍길동  → { "message": "hello, 홍길동" }
  * </pre>
  *
  * <p>생성자 주입을 사용해 final 필드로 의존성을 고정한다.
