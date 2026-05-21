@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch06 — 검증과 예외 (Problem Details)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-5xl mx-auto p-8">
+    <header class="border-b border-anvil-muted pb-4 mb-6">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch06-validation</p>
+      <h1 class="text-3xl font-bold text-anvil-accent mt-1">검증과 예외 — Bean Validation + RFC 7807</h1>
+      <p class="text-anvil-muted mt-2 text-sm">
+        잘못된 요청에 대한 응답이 *프로그래밍 가능* 한 형태(<code class="font-mono">errors[]</code>) 로 돌아온다.
+      </p>
+    </header>
+
+    <!-- 시나리오 빠른 버튼 -->
+    <section class="mb-6">
+      <h2 class="font-medium mb-2 text-sm text-anvil-muted">빠른 시나리오</h2>
+      <div class="flex flex-wrap gap-2" id="scenarios"></div>
+    </section>
+
+    <div class="grid lg:grid-cols-2 gap-6">
+      <!-- 왼쪽: 송금 폼 -->
+      <section class="card p-6">
+        <h2 class="font-medium mb-3">송금 요청</h2>
+        <form id="form" class="space-y-3 text-sm">
+          <label class="block">
+            <span class="block text-xs text-anvil-muted mb-0.5">fromAccount</span>
+            <input name="fromAccount" class="field" />
+            <p class="err" data-err-for="fromAccount"></p>
+          </label>
+          <label class="block">
+            <span class="block text-xs text-anvil-muted mb-0.5">toAccount</span>
+            <input name="toAccount" class="field" />
+            <p class="err" data-err-for="toAccount"></p>
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block">
+              <span class="block text-xs text-anvil-muted mb-0.5">amount</span>
+              <input name="amount" type="number" class="field" />
+              <p class="err" data-err-for="amount"></p>
+            </label>
+            <label class="block">
+              <span class="block text-xs text-anvil-muted mb-0.5">currency (ISO 4217)</span>
+              <input name="currency" maxlength="3" class="field uppercase" />
+              <p class="err" data-err-for="currency"></p>
+            </label>
+          </div>
+          <label class="block">
+            <span class="block text-xs text-anvil-muted mb-0.5">memo (선택)</span>
+            <input name="memo" class="field" />
+            <p class="err" data-err-for="memo"></p>
+          </label>
+
+          <fieldset class="border border-anvil-muted/40 rounded p-3">
+            <legend class="text-xs px-1 text-anvil-muted">options</legend>
+            <label class="block">
+              <input type="checkbox" name="urgent" class="mr-1" />
+              <span class="text-xs">urgent</span>
+            </label>
+            <label class="block mt-2">
+              <span class="block text-xs text-anvil-muted mb-0.5">notifyEmail (urgent=true 시 필수)</span>
+              <input name="notifyEmail" type="email" class="field" />
+              <p class="err" data-err-for="options.notifyEmail"></p>
+            </label>
+            <label class="block mt-2">
+              <span class="block text-xs text-anvil-muted mb-0.5">scheduledAt (오늘 또는 이후)</span>
+              <input name="scheduledAt" type="date" class="field" />
+              <p class="err" data-err-for="options.scheduledAt"></p>
+            </label>
+          </fieldset>
+
+          <button type="submit" class="bg-anvil-accent text-white px-4 py-2 rounded hover:opacity-90 mt-2">
+            송금 요청
+          </button>
+        </form>
+      </section>
+
+      <!-- 오른쪽: 응답 + 컬렉션 -->
+      <section class="space-y-6">
+        <div class="card p-6">
+          <h2 class="font-medium mb-2">응답</h2>
+          <div id="statusLine" class="text-sm text-anvil-muted mb-2">아직 호출 없음.</div>
+          <pre id="response" class="hidden p-2 bg-white border border-anvil-muted rounded text-xs font-mono overflow-x-auto"></pre>
+        </div>
+        <div class="card p-6">
+          <div class="flex items-baseline justify-between mb-2">
+            <h2 class="font-medium">처리된 송금 <span id="totalBadge" class="ml-1 text-xs bg-anvil-muted text-white px-1.5 py-0.5 rounded">0</span></h2>
+            <button id="refreshList" class="text-sm text-anvil-data hover:underline">새로고침</button>
+          </div>
+          <ul id="list" class="text-xs font-mono space-y-1"></ul>
+        </div>
+      </section>
+    </div>
+
+    <footer class="mt-8 text-xs text-anvil-muted leading-relaxed">
+      백엔드: <code class="font-mono">POST /api/v1/transfers</code> ·
+      에러 형식: <code class="font-mono">application/problem+json</code>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
