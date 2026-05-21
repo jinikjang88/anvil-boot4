@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch03 — 의존성 주입과 빈 그래프</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-4xl mx-auto p-8">
+    <header class="border-b border-anvil-muted pb-4 mb-8">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch03-di</p>
+      <h1 class="text-3xl font-bold text-anvil-accent mt-1">의존성 주입 — 왜 <code class="font-mono">new</code> 쓰면 안 되나</h1>
+      <p class="text-anvil-muted mt-2 text-sm">
+        Spring 이 엮어준 실제 빈 그래프를 그대로 보여주고, 그 위에서 알림 한 건을 발송한다.
+      </p>
+    </header>
+
+    <!-- 알림 발송 -->
+    <section class="card p-6 mb-6">
+      <h2 class="font-medium mb-3">알림 한 건 보내보기</h2>
+
+      <div class="grid sm:grid-cols-2 gap-3">
+        <label class="block">
+          <span class="block text-sm font-medium mb-1">수신자</span>
+          <input
+            id="recipient"
+            type="text"
+            value="user@example.com"
+            class="w-full border border-anvil-muted rounded px-3 py-2 bg-white"
+            placeholder="user@example.com 또는 01012345678"
+          />
+        </label>
+        <label class="block">
+          <span class="block text-sm font-medium mb-1">제목 (선택)</span>
+          <input
+            id="subject"
+            type="text"
+            value="hello"
+            class="w-full border border-anvil-muted rounded px-3 py-2 bg-white"
+          />
+        </label>
+      </div>
+
+      <label class="block mt-3">
+        <span class="block text-sm font-medium mb-1">본문</span>
+        <textarea
+          id="body"
+          rows="2"
+          class="w-full border border-anvil-muted rounded px-3 py-2 bg-white font-mono text-sm"
+        >대장간 백엔드, 잘 작동 중.</textarea>
+      </label>
+
+      <button
+        id="send"
+        class="mt-3 bg-anvil-accent text-white px-4 py-2 rounded hover:opacity-90 disabled:opacity-50"
+      >발송</button>
+
+      <p id="status" class="mt-3 text-sm text-anvil-muted">
+        수신자가 <code class="font-mono">@</code> 를 포함하면 email, 아니면 sms 채널로 라우팅됩니다.
+      </p>
+
+      <pre
+        id="result"
+        class="mt-3 hidden p-3 bg-white border border-anvil-muted rounded text-xs font-mono overflow-x-auto"
+      ></pre>
+    </section>
+
+    <!-- 의존성 그래프 -->
+    <section class="card p-6">
+      <div class="flex items-baseline justify-between mb-3">
+        <h2 class="font-medium">실시간 빈 의존성 그래프</h2>
+        <button id="refresh" class="text-sm text-anvil-data hover:underline">새로고침</button>
+      </div>
+
+      <svg id="graph" class="w-full border border-anvil-muted rounded bg-white" height="480"></svg>
+
+      <div id="legend" class="mt-3 flex flex-wrap gap-3 text-xs text-anvil-muted"></div>
+
+      <p class="mt-3 text-xs text-anvil-muted leading-relaxed">
+        화살표는 "A 가 B 를 주입받는다" 방향. <code class="font-mono">ChannelRouter</code> 가
+        <code class="font-mono">Map&lt;String, Channel&gt;</code> 으로 두 채널을 한꺼번에 수집하는
+        패턴이 두 엣지로 보입니다.
+      </p>
+    </section>
+
+    <footer class="mt-8 text-xs text-anvil-muted leading-relaxed">
+      백엔드: <code class="font-mono">POST /api/notify · GET /api/beans/graph</code>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
