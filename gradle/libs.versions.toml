@@ -13,14 +13,27 @@ testcontainers = "1.21.3"
 # 인프라
 postgresql = "42.7.4"
 
+# 보안
+jjwt = "0.12.6"
+
 [libraries]
 # Spring Boot 의존성 (버전은 Boot BOM 이 관리하므로 명시하지 않음)
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+# Jackson — Boot 4 에서 starter-web 의 transitive 로는 jackson-databind 가 컴파일 클래스패스에 들어오지 않을 수 있어 명시 의존
+spring-boot-starter-json = { module = "org.springframework.boot:spring-boot-starter-json" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 # Boot 4 에서 WebMvcTest 슬라이스 테스트는 별도 모듈로 분리됨
 spring-boot-webmvc-test = { module = "org.springframework.boot:spring-boot-webmvc-test" }
+# Security 테스트 헬퍼 (@WithMockUser 등)
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
+
+# JWT (jjwt 0.12 — JSON Web Token 발급/검증)
+jjwt-api     = { module = "io.jsonwebtoken:jjwt-api",     version.ref = "jjwt" }
+jjwt-impl    = { module = "io.jsonwebtoken:jjwt-impl",    version.ref = "jjwt" }
+jjwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
 
 # 테스트
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }

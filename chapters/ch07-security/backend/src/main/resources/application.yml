@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: ch07-security
+  profiles:
+    active: local
+  config:
+    # 시크릿(JWT 서명키, AES 키) 은 별도 파일. .gitignore 가 차단.
+    import: "optional:classpath:application-local-secret.yml"
+
+server:
+  port: 8080
+
+anvil:
+  security:
+    jwt:
+      # 32바이트 (256비트) base64 인코딩된 secret. 시크릿 파일에서 덮어쓰기 (HS256).
+      secret: "PLACEHOLDER-set-in-secret-file-or-environment-variable=="
+      expiration-seconds: 3600         # 1시간
+      issuer: "anvil-boot4"
+    encryption:
+      # AES-256 마스터 키. 32바이트 base64. 시크릿 파일에서 덮어쓰기.
+      master-key: "PLACEHOLDER-set-in-secret-file-or-environment-variable=="
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

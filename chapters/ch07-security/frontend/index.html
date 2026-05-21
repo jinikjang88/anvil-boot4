@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch07 — 보안 기초 (JWT + 인가)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-6xl mx-auto p-6">
+    <header class="border-b border-anvil-muted pb-3 mb-5 flex items-baseline justify-between">
+      <div>
+        <p class="text-anvil-muted text-sm">대장간 백엔드 · ch07-security</p>
+        <h1 class="text-2xl font-bold text-anvil-accent mt-1">보안 기초 — JWT · BCrypt · AES · 인가</h1>
+      </div>
+      <div id="sessionBadge" class="text-sm">
+        <span class="px-2 py-1 rounded bg-anvil-muted text-white">로그인 안 됨</span>
+      </div>
+    </header>
+
+    <div class="grid lg:grid-cols-3 gap-5">
+      <!-- 왼쪽: 인증 흐름 -->
+      <section class="card p-4 space-y-4">
+        <h2 class="font-medium">① 인증</h2>
+
+        <details open class="border border-anvil-muted/30 rounded">
+          <summary class="px-3 py-2 cursor-pointer bg-anvil-muted/5 text-sm font-medium">회원가입</summary>
+          <form id="registerForm" class="p-3 space-y-2 text-sm">
+            <input name="email" placeholder="email" class="field" />
+            <input name="password" type="password" placeholder="password (8자+)" class="field" />
+            <input name="name" placeholder="name" class="field" />
+            <input name="phoneNumber" placeholder="010-1234-5678" class="field" />
+            <select name="role" class="field">
+              <option value="USER">USER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+            <button class="bg-anvil-accent text-white px-3 py-1 rounded w-full">회원가입</button>
+          </form>
+        </details>
+
+        <details open class="border border-anvil-muted/30 rounded">
+          <summary class="px-3 py-2 cursor-pointer bg-anvil-muted/5 text-sm font-medium">로그인</summary>
+          <form id="loginForm" class="p-3 space-y-2 text-sm">
+            <input name="email" placeholder="email" class="field" />
+            <input name="password" type="password" placeholder="password" class="field" />
+            <button class="bg-anvil-accent text-white px-3 py-1 rounded w-full">로그인 (JWT 발급)</button>
+          </form>
+          <button id="logout" class="block mt-2 mx-3 mb-3 text-xs text-anvil-data hover:underline">로그아웃 (토큰 삭제)</button>
+        </details>
+
+        <div>
+          <p class="text-xs text-anvil-muted mb-1">최근 응답</p>
+          <pre id="authResponse" class="hidden p-2 bg-white border border-anvil-muted rounded text-xs font-mono overflow-x-auto"></pre>
+        </div>
+      </section>
+
+      <!-- 중앙: JWT 디코더 -->
+      <section class="card p-4">
+        <h2 class="font-medium mb-2">② JWT 디코더</h2>
+        <p class="text-xs text-anvil-muted mb-3">로그인하면 localStorage 의 토큰이 여기에 분해됩니다.</p>
+
+        <div class="space-y-3 text-xs font-mono">
+          <div>
+            <p class="text-anvil-muted mb-0.5">Raw token</p>
+            <pre id="rawToken" class="p-2 bg-white border border-anvil-muted rounded break-all whitespace-pre-wrap">(없음)</pre>
+          </div>
+          <div>
+            <p class="text-anvil-success mb-0.5">Header</p>
+            <pre id="jwtHeader" class="p-2 bg-white border border-anvil-success/60 rounded overflow-x-auto">-</pre>
+          </div>
+          <div>
+            <p class="text-anvil-data mb-0.5">Payload</p>
+            <pre id="jwtPayload" class="p-2 bg-white border border-anvil-data/60 rounded overflow-x-auto">-</pre>
+          </div>
+          <div>
+            <p class="text-anvil-accent mb-0.5">Signature (검증은 서버가)</p>
+            <pre id="jwtSig" class="p-2 bg-white border border-anvil-accent/60 rounded break-all whitespace-pre-wrap">-</pre>
+          </div>
+          <p id="expiry" class="text-anvil-muted">-</p>
+        </div>
+      </section>
+
+      <!-- 오른쪽: 보호된 API -->
+      <section class="card p-4 space-y-3">
+        <h2 class="font-medium">③ 보호된 엔드포인트</h2>
+        <p class="text-xs text-anvil-muted">현재 토큰을 <code class="font-mono">Authorization: Bearer</code> 로 자동 첨부.</p>
+
+        <button data-call="me"        class="api-btn bg-anvil-success">GET /api/v1/users/me — 본인</button>
+        <button data-call="usersAll"  class="api-btn bg-anvil-data">GET /api/v1/users — 관리자만</button>
+        <button data-call="meNoAuth"  class="api-btn bg-anvil-muted">GET /me — 토큰 없이 (→ 401)</button>
+
+        <pre id="apiResponse" class="hidden mt-2 p-2 bg-white border border-anvil-muted rounded text-xs font-mono overflow-x-auto"></pre>
+
+        <div class="text-xs text-anvil-muted leading-relaxed pt-2 border-t border-anvil-muted/30">
+          시나리오:
+          <ol class="list-decimal list-inside mt-1 space-y-0.5">
+            <li>USER 가입 + 로그인 → <span class="text-anvil-success">200</span> me / <span class="text-anvil-accent">403</span> users</li>
+            <li>ADMIN 가입 + 로그인 → <span class="text-anvil-success">200</span> 둘 다</li>
+            <li>로그아웃 후 me → <span class="text-anvil-accent">401</span></li>
+          </ol>
+        </div>
+      </section>
+    </div>
+
+    <footer class="mt-6 text-xs text-anvil-muted leading-relaxed">
+      백엔드: <code class="font-mono">/api/v1/auth/{register,login,decode} · /api/v1/users/{me,}</code>
+      · 에러 형식: <code class="font-mono">application/problem+json</code>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
