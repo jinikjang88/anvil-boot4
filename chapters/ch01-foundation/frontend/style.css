@@ -1,0 +1,30 @@
+/* 오행 팔레트 — 이 페이지가 실제 사용하는 토큰만 정의 (MUST: 안 쓰는 코드 제거).
+   전체 팔레트는 .claude/CLAUDE.md 의 비주얼 컨셉 섹션이 단일 출처. */
+:root {
+  --anvil-bg:      #F5EFE0; /* 土 — 배경 */
+  --anvil-accent:  #C0392B; /* 火 — 강조/에러 상태 */
+  --anvil-success: #3B7A57; /* 木 — 성공 상태 */
+  --anvil-muted:   #7F8C8D; /* 金 — 보조 텍스트/테두리 */
+  --anvil-fg:      #2C2C2C;
+}
+
+body {
+  background-color: var(--anvil-bg);
+  color: var(--anvil-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+               "Segoe UI", Roboto, sans-serif;
+}
+
+/* 이 페이지에서 실제 사용되는 유틸리티만 정의 (MUST: 안 쓰는 코드 제거) */
+.text-anvil-accent  { color: var(--anvil-accent); }
+.text-anvil-success { color: var(--anvil-success); }
+.text-anvil-muted   { color: var(--anvil-muted); }
+.bg-anvil-accent    { background-color: var(--anvil-accent); }
+.border-anvil-muted { border-color: var(--anvil-muted); }
+
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}

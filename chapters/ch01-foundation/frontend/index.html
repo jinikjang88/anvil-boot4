@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch01-foundation — hello, anvil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-2xl mx-auto p-8">
+    <header class="border-b border-anvil-muted pb-4 mb-8">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch01-foundation</p>
+      <h1 class="text-3xl font-bold text-anvil-accent mt-1">hello, anvil</h1>
+      <p class="text-anvil-muted mt-2 text-sm">
+        Spring Boot 4 + Java 25 toolchain 이 실제로 살아 있다는 걸 눈으로 확인한다.
+      </p>
+    </header>
+
+    <section class="card p-6">
+      <label for="name" class="block text-sm font-medium mb-2">이름 (선택)</label>
+      <div class="flex gap-2">
+        <input
+          id="name"
+          type="text"
+          placeholder="비워두면 기본값 'anvil'"
+          class="flex-1 border border-anvil-muted rounded px-3 py-2 bg-white"
+          maxlength="40"
+          autocomplete="off"
+        />
+        <button
+          id="call"
+          class="bg-anvil-accent text-white px-4 py-2 rounded hover:opacity-90 transition disabled:opacity-50"
+        >
+          호출
+        </button>
+      </div>
+
+      <p id="status" class="mt-4 text-sm text-anvil-muted">
+        호출 버튼을 누르면 <code class="font-mono">GET /api/hello</code> 를 fetch 합니다.
+      </p>
+
+      <pre id="result" class="mt-3 hidden p-3 bg-white border border-anvil-muted rounded text-sm font-mono overflow-x-auto"></pre>
+    </section>
+
+    <footer class="mt-8 text-xs text-anvil-muted leading-relaxed">
+      백엔드: <code class="font-mono">http://localhost:8080/api/hello</code><br/>
+      로컬 CORS 는 <code class="font-mono">local</code> 프로필에서만 열려 있습니다 — 실 운영 보안은 ch07.
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

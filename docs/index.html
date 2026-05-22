@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대장간 백엔드 — anvil-boot4 통합 인덱스</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 오행 팔레트 — 챕터 frontend 와 동일 */
+    :root {
+      --anvil-bg:      #F5EFE0; /* 土 */
+      --anvil-accent:  #C0392B; /* 火 */
+      --anvil-data:    #1E5F8C; /* 水 */
+      --anvil-success: #3B7A57; /* 木 */
+      --anvil-muted:   #7F8C8D; /* 金 */
+      --anvil-fg:      #2C2C2C;
+    }
+    body {
+      background-color: var(--anvil-bg);
+      color: var(--anvil-fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard",
+                   "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
+    }
+    .ch-card { border: 1px solid var(--anvil-muted); transition: transform .12s ease; }
+    .ch-card:hover { transform: translateY(-2px); border-color: var(--anvil-accent); }
+    .ch-card.locked { opacity: .5; cursor: not-allowed; }
+    .badge-ready    { background: var(--anvil-success); color: white; }
+    .badge-pending  { background: var(--anvil-muted);   color: white; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <main class="max-w-5xl mx-auto p-8">
+    <header class="border-b border-anvil-muted pb-6 mb-10">
+      <p style="color: var(--anvil-muted)" class="text-sm tracking-wide">DevSmith · 대장간 백엔드</p>
+      <h1 style="color: var(--anvil-accent)" class="text-4xl font-bold mt-2">anvil-boot4</h1>
+      <p class="mt-3">에북 <i>대장간 백엔드</i> 의 16 챕터 인터랙티브 데모.</p>
+    </header>
+
+    <!-- 챕터 카드는 각 챕터가 구현될 때 JS 또는 정적으로 추가 -->
+    <section id="chapters" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <p style="color: var(--anvil-muted)">챕터 데모는 각 챕터가 구현되면서 순차적으로 채워집니다.</p>
+    </section>
+
+    <footer class="mt-16 text-sm" style="color: var(--anvil-muted)">
+      <p>레포: <a class="underline" style="color: var(--anvil-data)" href="https://github.com/jinikjang88/anvil-boot4">github.com/jinikjang88/anvil-boot4</a></p>
+    </footer>
+  </main>
+</body>
+</html>

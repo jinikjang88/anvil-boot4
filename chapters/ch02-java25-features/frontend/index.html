@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch02 — Java 25 Virtual Thread vs Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-3xl mx-auto p-8">
+    <header class="border-b border-anvil-muted pb-4 mb-8">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch02-java25-features</p>
+      <h1 class="text-3xl font-bold text-anvil-accent mt-1">Virtual Thread 한 입</h1>
+      <p class="text-anvil-muted mt-2 text-sm">
+        외부 결제 호출(200ms) 을 N 건 fan-out 했을 때, 같은 도메인 로직이
+        executor 만 바뀌면 응답시간이 얼마나 차이 나는지 직접 측정한다.
+      </p>
+    </header>
+
+    <section class="card p-6 mb-6">
+      <label for="count" class="block text-sm font-medium mb-2">
+        동시 요청 수: <span id="countLabel" class="font-bold">100</span> 건
+      </label>
+      <input
+        id="count"
+        type="range"
+        min="10"
+        max="500"
+        step="10"
+        value="100"
+        class="w-full mb-4"
+      />
+
+      <button
+        id="run"
+        class="bg-anvil-accent text-white px-6 py-2 rounded hover:opacity-90 disabled:opacity-50"
+      >
+        비교 실행
+      </button>
+
+      <p id="status" class="mt-4 text-sm text-anvil-muted">
+        Platform(10 스레드 풀) → Virtual(태스크당 1개) 순으로 호출합니다.
+      </p>
+    </section>
+
+    <section class="card p-6 mb-6">
+      <h2 class="font-medium mb-3">응답 시간 비교 (ms)</h2>
+      <canvas id="chart" height="140"></canvas>
+    </section>
+
+    <section id="results" class="card p-6 hidden">
+      <h2 class="font-medium mb-3">결과 분류 · 샘플 (최대 10건)</h2>
+      <div class="grid sm:grid-cols-2 gap-6 text-sm">
+        <div>
+          <h3 class="font-semibold mb-1">Platform</h3>
+          <p id="platformCounts" class="text-anvil-muted mb-2"></p>
+          <pre id="platformSamples"
+               class="bg-white border border-anvil-muted rounded p-2 text-xs font-mono overflow-x-auto"></pre>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-1">Virtual</h3>
+          <p id="virtualCounts" class="text-anvil-muted mb-2"></p>
+          <pre id="virtualSamples"
+               class="bg-white border border-anvil-muted rounded p-2 text-xs font-mono overflow-x-auto"></pre>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-8 text-xs text-anvil-muted leading-relaxed">
+      백엔드: <code class="font-mono">POST http://localhost:8080/api/orders/process-{platform,virtual}</code><br/>
+      범례 — <span class="text-anvil-accent font-semibold">OK</span> 승인 ·
+      <span class="font-semibold">NG</span> 거절 ·
+      <span class="font-semibold">REV</span> 수동검토
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

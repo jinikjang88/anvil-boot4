@@ -1,0 +1,54 @@
+/* 오행 팔레트 — 본 챕터는 인증/인가 상태 5색을 모두 사용. */
+:root {
+  --anvil-bg:      #F5EFE0; /* 土 */
+  --anvil-accent:  #C0392B; /* 火 — 에러/401/403/signature */
+  --anvil-data:    #1E5F8C; /* 水 — 링크/payload/관리자 API */
+  --anvil-success: #3B7A57; /* 木 — 성공/200/header */
+  --anvil-muted:   #7F8C8D; /* 金 — 보조/대기 상태 */
+  --anvil-fg:      #2C2C2C;
+}
+
+body {
+  background-color: var(--anvil-bg);
+  color: var(--anvil-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+               "Segoe UI", Roboto, sans-serif;
+}
+
+.text-anvil-accent  { color: var(--anvil-accent); }
+.text-anvil-data    { color: var(--anvil-data); }
+.text-anvil-success { color: var(--anvil-success); }
+.text-anvil-muted   { color: var(--anvil-muted); }
+.bg-anvil-accent    { background-color: var(--anvil-accent); }
+.bg-anvil-data      { background-color: var(--anvil-data); }
+.bg-anvil-success   { background-color: var(--anvil-success); }
+.bg-anvil-muted     { background-color: var(--anvil-muted); }
+.border-anvil-muted { border-color: var(--anvil-muted); }
+
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.field {
+  width: 100%;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.25rem;
+  padding: 0.4rem 0.5rem;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.api-btn {
+  display: block;
+  width: 100%;
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  text-align: left;
+}
+.api-btn:hover { opacity: 0.9; }
