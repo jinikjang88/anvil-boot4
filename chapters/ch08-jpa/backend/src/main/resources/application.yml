@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: ch08-jpa
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/anvil
+    username: anvil
+    password: anvil
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # 학습용 — 매 부팅마다 테이블 재생성. 운영 절대 금지 (Flyway/Liquibase 사용).
+      ddl-auto: create-drop
+    show-sql: true
+    # OSIV off — 컨트롤러까지 영속성 컨텍스트가 열려있지 않게 한다.
+    # 학습 의도: LAZY 접근은 반드시 서비스 트랜잭션 안에서 끝내라.
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        use_sql_comments: true
+
+server:
+  port: 8080
+
+anvil:
+  seed:
+    enabled: true
+    post-count: 5
+    min-comments: 3
+    max-comments: 5
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    # Hibernate SQL / 바인딩 파라미터 모두 보고 학습.
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

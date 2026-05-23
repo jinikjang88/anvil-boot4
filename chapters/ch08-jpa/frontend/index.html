@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch08-jpa — JPA와 영속성 컨텍스트 — N+1 그 흔한 함정</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-6xl mx-auto p-6">
+
+    <header class="border-b border-anvil-muted pb-4 mb-6">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch08-jpa</p>
+      <h1 class="text-2xl font-bold text-anvil-accent mt-1">
+        JPA와 영속성 컨텍스트 — N+1 그 흔한 함정
+      </h1>
+      <p class="text-sm mt-2" style="color: var(--anvil-fg)">
+        같은 게시판 목록을 두 가지 방식으로 호출해 발행된 SQL 을 사이드바이사이드 비교한다.
+        오른쪽이 빠른 이유는 단 하나 — 쿼리 수가 다르다.
+      </p>
+    </header>
+
+    <!-- 비교 요약 배지 -->
+    <section id="summary" class="grid grid-cols-2 gap-4 mb-4">
+      <div class="card p-3 sql-box lazy">
+        <p class="text-xs text-anvil-muted">LAZY (N+1)</p>
+        <p class="text-3xl font-bold mt-1" style="color: var(--anvil-accent)">
+          <span id="lazyCount">-</span> <span class="text-sm font-normal">queries</span>
+        </p>
+        <p class="text-xs mt-1" style="color: var(--anvil-muted)">
+          소요 <span id="lazyMs">-</span> ms
+        </p>
+      </div>
+      <div class="card p-3 sql-box fetch">
+        <p class="text-xs text-anvil-muted">FETCH (@EntityGraph)</p>
+        <p class="text-3xl font-bold mt-1" style="color: var(--anvil-success)">
+          <span id="fetchCount">-</span> <span class="text-sm font-normal">queries</span>
+        </p>
+        <p class="text-xs mt-1" style="color: var(--anvil-muted)">
+          소요 <span id="fetchMs">-</span> ms
+        </p>
+      </div>
+    </section>
+
+    <!-- 좌우 호출 -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      <div class="card p-4 sql-box lazy">
+        <div class="flex items-baseline justify-between mb-2">
+          <h2 class="font-medium" style="color: var(--anvil-accent)">① LAZY 호출</h2>
+          <code class="text-xs text-anvil-muted">GET /api/v1/posts/lazy</code>
+        </div>
+        <button id="btnLazy" class="api-btn bg-anvil-accent text-white">
+          호출 — N+1 을 일으킨다
+        </button>
+        <p class="text-xs mt-2" style="color: var(--anvil-muted)">
+          findAll() + DTO 매핑 단계에서 comments LAZY 초기화 → 게시글 수만큼 추가 SELECT.
+        </p>
+        <ol id="lazySql" class="sql-list mt-3"></ol>
+      </div>
+
+      <div class="card p-4 sql-box fetch">
+        <div class="flex items-baseline justify-between mb-2">
+          <h2 class="font-medium" style="color: var(--anvil-success)">② FETCH 호출</h2>
+          <code class="text-xs text-anvil-muted">GET /api/v1/posts/fetch</code>
+        </div>
+        <button id="btnFetch" class="api-btn bg-anvil-success text-white">
+          호출 — @EntityGraph 로 한 방
+        </button>
+        <p class="text-xs mt-2" style="color: var(--anvil-muted)">
+          PostRepository.findAllWithComments() — distinct + @EntityGraph.
+        </p>
+        <ol id="fetchSql" class="sql-list mt-3"></ol>
+      </div>
+    </section>
+
+    <!-- 데이터 작성 -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      <div class="card p-4">
+        <h2 class="font-medium mb-2">③ 게시글 작성</h2>
+        <form id="postForm" class="space-y-2">
+          <input name="title" placeholder="제목" required class="field" />
+          <textarea name="content" placeholder="본문" required rows="3" class="field"></textarea>
+          <button class="bg-anvil-data text-white px-3 py-1 rounded w-full">POST /api/v1/posts</button>
+        </form>
+        <pre id="postResp" class="hidden mt-2 p-2 bg-white border text-xs"></pre>
+      </div>
+
+      <div class="card p-4">
+        <h2 class="font-medium mb-2">④ 댓글 작성</h2>
+        <form id="commentForm" class="space-y-2">
+          <input name="postId" type="number" placeholder="post id (예: 1)" required class="field" />
+          <input name="author" placeholder="작성자" required class="field" />
+          <input name="body" placeholder="댓글" required class="field" />
+          <button class="bg-anvil-data text-white px-3 py-1 rounded w-full">
+            POST /api/v1/posts/{id}/comments
+          </button>
+        </form>
+        <pre id="commentResp" class="hidden mt-2 p-2 bg-white border text-xs"></pre>
+      </div>
+    </section>
+
+    <section class="card p-3 text-xs" style="color: var(--anvil-muted)">
+      ※ 백엔드가 <code>http://localhost:8080</code> 에서 실행 중이어야 합니다.
+      Postgres 는 <code>docker compose -f docker/docker-compose.local.yml up -d postgres</code> 로 기동.
+    </section>
+
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
