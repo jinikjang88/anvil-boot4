@@ -21,24 +21,219 @@
       font-family: -apple-system, BlinkMacSystemFont, "Pretendard",
                    "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
     }
-    .ch-card { border: 1px solid var(--anvil-muted); transition: transform .12s ease; }
-    .ch-card:hover { transform: translateY(-2px); border-color: var(--anvil-accent); }
-    .ch-card.locked { opacity: .5; cursor: not-allowed; }
+    .ch-card {
+      border: 1px solid var(--anvil-muted);
+      transition: transform .12s ease, border-color .12s ease;
+      background: #FFFFFF;
+    }
+    .ch-card:not(.locked):hover {
+      transform: translateY(-2px);
+      border-color: var(--anvil-accent);
+    }
+    .ch-card.locked { opacity: .55; cursor: not-allowed; }
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.25rem;
+      font-weight: 500;
+    }
     .badge-ready    { background: var(--anvil-success); color: white; }
     .badge-pending  { background: var(--anvil-muted);   color: white; }
+    .part-label {
+      color: var(--anvil-muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 2rem 0 0.75rem;
+      border-bottom: 1px solid var(--anvil-muted);
+      padding-bottom: 0.25rem;
+    }
   </style>
 </head>
 <body class="min-h-screen">
   <main class="max-w-5xl mx-auto p-8">
-    <header class="border-b border-anvil-muted pb-6 mb-10">
+    <header class="border-b border-anvil-muted pb-6 mb-6">
       <p style="color: var(--anvil-muted)" class="text-sm tracking-wide">DevSmith · 대장간 백엔드</p>
       <h1 style="color: var(--anvil-accent)" class="text-4xl font-bold mt-2">anvil-boot4</h1>
-      <p class="mt-3">에북 <i>대장간 백엔드</i> 의 16 챕터 인터랙티브 데모.</p>
+      <p class="mt-3">에북 <i>대장간 백엔드</i> 의 16 챕터 인터랙티브 데모. Spring Boot 4 + Java 25.</p>
     </header>
 
-    <!-- 챕터 카드는 각 챕터가 구현될 때 JS 또는 정적으로 추가 -->
-    <section id="chapters" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <p style="color: var(--anvil-muted)">챕터 데모는 각 챕터가 구현되면서 순차적으로 채워집니다.</p>
+    <!-- Part 1. 기초 다지기 -->
+    <p class="part-label">Part 1. 기초 다지기 (모루에 올리기)</p>
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch01-foundation/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 01</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">Spring Boot 4 의 세계</h3>
+        <p class="text-sm mt-1">왜 또 새 버전인가 — 자동 구성과 첫 부팅의 정체.</p>
+      </a>
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch02-java25-features/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 02</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">Java 25 신문법</h3>
+        <p class="text-sm mt-1">Virtual Thread · Record · Sealed · Pattern Matching 한 입씩.</p>
+      </a>
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch03-di/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 03</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">의존성 주입</h3>
+        <p class="text-sm mt-1">왜 <code>new</code> 를 쓰면 안 되나 — 알림 발송 도메인 + D3 빈 그래프.</p>
+      </a>
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch04-config/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 04</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">설정의 기술</h3>
+        <p class="text-sm mt-1">local/dev/prod 프로파일 · @ConfigurationProperties · 시크릿 분리.</p>
+      </a>
+    </section>
+
+    <!-- Part 2. 웹 계층 -->
+    <p class="part-label">Part 2. 웹 계층 (망치질 시작)</p>
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch05-rest-api/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 05</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">REST API 설계</h3>
+        <p class="text-sm mt-1">URI · 상태코드 · 멱등성을 메뉴판처럼 — 주문 리소스 시뮬레이터.</p>
+      </a>
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch06-validation/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 06</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">검증과 예외</h3>
+        <p class="text-sm mt-1">Bean Validation + RFC 7807 ProblemDetail.</p>
+      </a>
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch07-security/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 07</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">보안 기초</h3>
+        <p class="text-sm mt-1">JWT · BCrypt · AES · 역할 기반 인가 통합 시나리오.</p>
+      </a>
+    </section>
+
+    <!-- Part 3. 데이터 계층 -->
+    <p class="part-label">Part 3. 데이터 계층 (담금질)</p>
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <a class="ch-card block p-4 rounded" href="../chapters/ch08-jpa/frontend/index.html">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 08</span>
+          <span class="badge badge-ready">READY</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">JPA 와 영속성 컨텍스트</h3>
+        <p class="text-sm mt-1">N+1 시연 — LAZY vs @EntityGraph 의 SQL 로그 좌우 비교.</p>
+      </a>
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 09</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">QueryDSL</h3>
+        <p class="text-sm mt-1">타입 안전 동적 쿼리 — JPQL 한계 보완.</p>
+      </div>
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 09b</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">jOOQ — SQL-First 비교</h3>
+        <p class="text-sm mt-1">ORM-First ↔ SQL-First 패러다임 비교.</p>
+      </div>
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 10</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">트랜잭션</h3>
+        <p class="text-sm mt-1">격리 · 전파 · AOP 함정.</p>
+      </div>
+    </section>
+
+    <!-- Part 4. 확장 -->
+    <p class="part-label">Part 4. 확장 (벼림의 정수)</p>
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 11</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">캐시</h3>
+        <p class="text-sm mt-1">Redis · TTL · Stampede 방지.</p>
+      </div>
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 12</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">비동기와 이벤트</h3>
+        <p class="text-sm mt-1">Virtual Thread Executor · @Async.</p>
+      </div>
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 13</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">메시징 (Kafka)</h3>
+        <p class="text-sm mt-1">파티션 · 컨슈머 그룹 · 멱등성.</p>
+      </div>
+    </section>
+
+    <!-- Part 5. 운영 -->
+    <p class="part-label">Part 5. 운영 (검수와 마무리)</p>
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 14</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">테스트</h3>
+        <p class="text-sm mt-1">Testcontainers · 테스트 더블 · 피라미드.</p>
+      </div>
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 15</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">관측성</h3>
+        <p class="text-sm mt-1">Micrometer · OpenTelemetry · 구조화 로깅.</p>
+      </div>
+
+      <div class="ch-card locked block p-4 rounded">
+        <div class="flex items-baseline justify-between">
+          <span class="text-xs" style="color: var(--anvil-muted)">CH 16</span>
+          <span class="badge badge-pending">PENDING</span>
+        </div>
+        <h3 class="mt-1 font-medium" style="color: var(--anvil-data)">배포</h3>
+        <p class="text-sm mt-1">GraalVM Native · Docker · Actions · Blue-Green.</p>
+      </div>
     </section>
 
     <footer class="mt-16 text-sm" style="color: var(--anvil-muted)">
