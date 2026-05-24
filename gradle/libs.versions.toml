@@ -51,6 +51,10 @@ postgresql-driver = { module = "org.postgresql:postgresql", version.ref = "postg
 # JPA / Hibernate (버전은 Spring Boot BOM 이 관리)
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 
+# jOOQ — SQL-First (ch09b 에서 사용). 버전은 Spring Boot BOM 이 관리.
+# Lite 워크플로 (codegen 없이) → starter 만으로 DSLContext 자동 설정.
+spring-boot-starter-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq" }
+
 # QueryDSL — 타입 세이프 동적 쿼리 빌더
 # - jpa: 런타임 (JPAQueryFactory)
 # - apt: Q클래스 코드 생성 (annotationProcessor)
