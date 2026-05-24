@@ -1,0 +1,87 @@
+/* 오행 팔레트 — 대장간 + 사주 브랜드 통합 */
+:root {
+  --anvil-bg:      #F5EFE0; /* 土 — 베이지 배경 */
+  --anvil-accent:  #C0392B; /* 火 — 강조/경고 */
+  --anvil-data:    #1E5F8C; /* 水 — 데이터/링크 */
+  --anvil-success: #3B7A57; /* 木 — 성공/긍정 */
+  --anvil-muted:   #7F8C8D; /* 金 — 보조 텍스트 */
+  --anvil-fg:      #2C2C2C;
+}
+
+body {
+  background-color: var(--anvil-bg);
+  color: var(--anvil-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+               "Segoe UI", Roboto, sans-serif;
+}
+
+.text-anvil-accent  { color: var(--anvil-accent); }
+.text-anvil-data    { color: var(--anvil-data); }
+.text-anvil-success { color: var(--anvil-success); }
+.text-anvil-muted   { color: var(--anvil-muted); }
+.bg-anvil-accent    { background-color: var(--anvil-accent); }
+.bg-anvil-data      { background-color: var(--anvil-data); }
+.bg-anvil-success   { background-color: var(--anvil-success); }
+.border-anvil-muted { border-color: var(--anvil-muted); }
+
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.field {
+  width: 100%;
+  border: 1px solid var(--anvil-muted);
+  padding: 0.4rem 0.5rem;
+  background: #fff;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+}
+
+/* 세 가지 모드 — 火/水/木 좌측 보더로 구분 */
+.sql-box.jpql       { border-left: 4px solid var(--anvil-accent); }
+.sql-box.builder    { border-left: 4px solid var(--anvil-data); }
+.sql-box.expression { border-left: 4px solid var(--anvil-success); }
+
+/* SQL 로그 */
+.sql-list {
+  list-style: decimal inside;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  background: #FFFEFB;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.sql-list li {
+  padding: 0.25rem 0;
+  border-bottom: 1px dashed #EEE;
+  word-break: break-all;
+}
+.sql-list li:last-child { border-bottom: 0; }
+.sql-kw { color: var(--anvil-data); font-weight: 600; }
+
+/* 검색 결과 */
+.data-list {
+  font-size: 0.78rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.data-list li {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid #EEE;
+}
+.data-list li:last-child { border-bottom: 0; }
+.data-list .title  { font-weight: 600; color: var(--anvil-fg); }
+.data-list .meta   { color: var(--anvil-muted); font-size: 0.7rem; margin-top: 0.1rem; }
+
+.empty {
+  color: var(--anvil-muted);
+  font-style: italic;
+  padding: 0.5rem;
+  font-size: 0.78rem;
+}

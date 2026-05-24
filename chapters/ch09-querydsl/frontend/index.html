@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch09-querydsl — QueryDSL과 동적 쿼리</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-7xl mx-auto p-6">
+
+    <header class="border-b border-anvil-muted pb-4 mb-6">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch09-querydsl</p>
+      <h1 class="text-2xl font-bold text-anvil-accent mt-1">
+        QueryDSL과 동적 쿼리 — 5개 조건을 한 쿼리로
+      </h1>
+      <p class="text-sm mt-2" style="color: var(--anvil-fg)">
+        같은 검색 조건을 세 가지로 호출해 발행 SQL 을 사이드바이사이드 비교한다.
+        조건을 빼고 넣으며 <code>where</code> 절이 어떻게 변하는지 직접 보자.
+      </p>
+    </header>
+
+    <!-- ───── 검색 폼 ───── -->
+    <section class="card p-4 mb-6">
+      <h2 class="font-medium mb-3" style="color: var(--anvil-data)">검색 조건 (비우면 무시)</h2>
+      <form id="searchForm" class="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
+        <label class="flex flex-col">
+          <span class="text-xs text-anvil-muted mb-1">keyword (제목+본문)</span>
+          <input name="keyword" placeholder="예: QueryDSL" class="field" />
+        </label>
+        <label class="flex flex-col">
+          <span class="text-xs text-anvil-muted mb-1">author</span>
+          <input name="author" placeholder="예: 민지" class="field" />
+        </label>
+        <label class="flex flex-col">
+          <span class="text-xs text-anvil-muted mb-1">from (local)</span>
+          <input name="from" type="datetime-local" class="field" />
+        </label>
+        <label class="flex flex-col">
+          <span class="text-xs text-anvil-muted mb-1">to (local)</span>
+          <input name="to" type="datetime-local" class="field" />
+        </label>
+        <label class="flex flex-col">
+          <span class="text-xs text-anvil-muted mb-1">hasComments</span>
+          <select name="hasComments" class="field">
+            <option value="">(미지정)</option>
+            <option value="true">true — 댓글 있음</option>
+            <option value="false">false — 댓글 없음</option>
+          </select>
+        </label>
+      </form>
+      <div class="mt-3 flex gap-2 items-center text-sm">
+        <button id="btnRun" class="bg-anvil-data text-white px-4 py-1.5 rounded">
+          세 가지 호출 실행
+        </button>
+        <button id="btnReset" type="button" class="px-3 py-1.5 rounded border" style="border-color: var(--anvil-muted)">
+          조건 초기화
+        </button>
+        <span class="text-xs text-anvil-muted ml-2">
+          page=0, size=20 고정 (학습 단순화)
+        </span>
+      </div>
+    </section>
+
+    <!-- ───── 비교 요약 배지 ───── -->
+    <section class="grid grid-cols-3 gap-4 mb-4">
+      <div class="card p-3 sql-box jpql">
+        <p class="text-xs text-anvil-muted">① JPQL String concat</p>
+        <p class="text-2xl font-bold mt-1" style="color: var(--anvil-accent)">
+          <span id="jpqlCount">-</span> <span class="text-sm font-normal">queries</span>
+        </p>
+        <p class="text-xs mt-1" style="color: var(--anvil-muted)">
+          소요 <span id="jpqlMs">-</span> ms · <span id="jpqlTotal">-</span> rows
+        </p>
+        <p class="text-xs mt-1 italic" style="color: var(--anvil-accent)">안티패턴 — if 문 폭발</p>
+      </div>
+      <div class="card p-3 sql-box builder">
+        <p class="text-xs text-anvil-muted">② QueryDSL BooleanBuilder</p>
+        <p class="text-2xl font-bold mt-1" style="color: var(--anvil-data)">
+          <span id="builderCount">-</span> <span class="text-sm font-normal">queries</span>
+        </p>
+        <p class="text-xs mt-1" style="color: var(--anvil-muted)">
+          소요 <span id="builderMs">-</span> ms · <span id="builderTotal">-</span> rows
+        </p>
+        <p class="text-xs mt-1 italic" style="color: var(--anvil-data)">명령형 — 타입 세이프</p>
+      </div>
+      <div class="card p-3 sql-box expression">
+        <p class="text-xs text-anvil-muted">③ QueryDSL BooleanExpression</p>
+        <p class="text-2xl font-bold mt-1" style="color: var(--anvil-success)">
+          <span id="exprCount">-</span> <span class="text-sm font-normal">queries</span>
+        </p>
+        <p class="text-xs mt-1" style="color: var(--anvil-muted)">
+          소요 <span id="exprMs">-</span> ms · <span id="exprTotal">-</span> rows
+        </p>
+        <p class="text-xs mt-1 italic" style="color: var(--anvil-success)">함수형 — 권장</p>
+      </div>
+    </section>
+
+    <!-- ───── 세 호출의 SQL & 결과 ───── -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+      <div class="card p-4 sql-box jpql">
+        <div class="flex items-baseline justify-between mb-2">
+          <h2 class="font-medium" style="color: var(--anvil-accent)">① JPQL concat</h2>
+          <code class="text-xs text-anvil-muted">/search/jpql</code>
+        </div>
+        <ol id="jpqlSql" class="sql-list"></ol>
+        <h3 class="text-xs font-semibold mt-3 mb-1" style="color: var(--anvil-muted)">결과</h3>
+        <ul id="jpqlData" class="data-list"></ul>
+      </div>
+      <div class="card p-4 sql-box builder">
+        <div class="flex items-baseline justify-between mb-2">
+          <h2 class="font-medium" style="color: var(--anvil-data)">② BooleanBuilder</h2>
+          <code class="text-xs text-anvil-muted">/search/builder</code>
+        </div>
+        <ol id="builderSql" class="sql-list"></ol>
+        <h3 class="text-xs font-semibold mt-3 mb-1" style="color: var(--anvil-muted)">결과</h3>
+        <ul id="builderData" class="data-list"></ul>
+      </div>
+      <div class="card p-4 sql-box expression">
+        <div class="flex items-baseline justify-between mb-2">
+          <h2 class="font-medium" style="color: var(--anvil-success)">③ BooleanExpression</h2>
+          <code class="text-xs text-anvil-muted">/search/expression</code>
+        </div>
+        <ol id="exprSql" class="sql-list"></ol>
+        <h3 class="text-xs font-semibold mt-3 mb-1" style="color: var(--anvil-muted)">결과</h3>
+        <ul id="exprData" class="data-list"></ul>
+      </div>
+    </section>
+
+    <!-- ───── jOOQ 비교 안내 ───── -->
+    <section class="card p-4 mb-6" style="border-left: 4px solid var(--anvil-muted)">
+      <h2 class="font-medium mb-2">ch09b-jOOQ 에서 다룰 영역 (QueryDSL 한계)</h2>
+      <ul class="text-sm list-disc list-inside space-y-1" style="color: var(--anvil-fg)">
+        <li><b>윈도우 함수</b> — <code>ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)</code>: QueryDSL 표준 미지원, native query 우회</li>
+        <li><b>CTE / WITH RECURSIVE</b> — 카테고리 트리 / 조직도 재귀 조회</li>
+        <li><b>벤더 특화 SQL</b> — PostgreSQL <code>jsonb_path_query</code>, <code>FOR UPDATE SKIP LOCKED</code></li>
+        <li><b>벌크 UPSERT</b> — <code>INSERT ... ON CONFLICT DO UPDATE</code> (JPA 패러다임에 안 맞음)</li>
+        <li><b>코드 생성 방향</b> — JPA/QueryDSL: 클래스 → DB / jOOQ: DB → 클래스 (SQL-First)</li>
+      </ul>
+    </section>
+
+    <!-- ───── 게시글/댓글 작성 ───── -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      <div class="card p-4">
+        <h2 class="font-medium mb-2">게시글 작성</h2>
+        <form id="postForm" class="space-y-2">
+          <input name="title" placeholder="제목" required class="field" />
+          <input name="author" placeholder="작성자" required class="field" />
+          <textarea name="content" placeholder="본문" required rows="2" class="field"></textarea>
+          <button class="bg-anvil-data text-white px-3 py-1 rounded w-full text-sm">
+            POST /api/v1/posts
+          </button>
+        </form>
+        <pre id="postResp" class="hidden mt-2 p-2 bg-white border text-xs"></pre>
+      </div>
+      <div class="card p-4">
+        <h2 class="font-medium mb-2">댓글 작성</h2>
+        <form id="commentForm" class="space-y-2">
+          <input name="postId" type="number" placeholder="post id" required class="field" />
+          <input name="author" placeholder="작성자" required class="field" />
+          <input name="body" placeholder="댓글" required class="field" />
+          <button class="bg-anvil-data text-white px-3 py-1 rounded w-full text-sm">
+            POST /api/v1/posts/{id}/comments
+          </button>
+        </form>
+        <pre id="commentResp" class="hidden mt-2 p-2 bg-white border text-xs"></pre>
+      </div>
+    </section>
+
+    <section class="card p-3 text-xs" style="color: var(--anvil-muted)">
+      ※ 백엔드가 <code>http://localhost:8080</code> 에서 실행 중이어야 합니다.
+      Postgres 는 <code>docker compose -f docker/docker-compose.local.yml up -d postgres</code>.
+    </section>
+
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
