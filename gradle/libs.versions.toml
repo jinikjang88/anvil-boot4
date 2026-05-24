@@ -16,6 +16,9 @@ postgresql = "42.7.4"
 # 보안
 jjwt = "0.12.6"
 
+# 쿼리 DSL — Boot 4 / Jakarta EE 9+ 라 :jakarta classifier 필수
+querydsl = "5.1.0"
+
 [libraries]
 # Spring Boot 의존성 (버전은 Boot BOM 이 관리하므로 명시하지 않음)
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -47,6 +50,14 @@ postgresql-driver = { module = "org.postgresql:postgresql", version.ref = "postg
 
 # JPA / Hibernate (버전은 Spring Boot BOM 이 관리)
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+
+# QueryDSL — 타입 세이프 동적 쿼리 빌더
+# - jpa: 런타임 (JPAQueryFactory)
+# - apt: Q클래스 코드 생성 (annotationProcessor)
+# Jakarta 네임스페이스 (Hibernate 6 / Boot 3+) 라 :jakarta classifier 필수.
+# 안 붙이면 javax.persistence.* 를 import 한 Q클래스가 생성돼 컴파일 실패.
+querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
+querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
