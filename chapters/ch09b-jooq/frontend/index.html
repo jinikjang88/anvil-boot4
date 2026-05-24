@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch09b-jooq — SQL-First 비교</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-7xl mx-auto p-6">
+
+    <header class="border-b border-anvil-muted pb-4 mb-6">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch09b-jooq (ch09 자매편)</p>
+      <h1 class="text-2xl font-bold text-anvil-accent mt-1">
+        jOOQ — ch09 QueryDSL 이 못 하던 것들
+      </h1>
+      <p class="text-sm mt-2" style="color: var(--anvil-fg)">
+        SQL-First 도구의 진짜 가치는 <b>윈도우 함수 · CTE · ON CONFLICT · 진짜 batch</b> 같이
+        ORM 패러다임에 안 맞는 영역에서 드러난다.
+      </p>
+    </header>
+
+    <!-- ── 1) 검색 (ch09 비교군) ──────────────────────────────────────── -->
+    <section class="card p-4 mb-6 sql-box search">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-medium" style="color: var(--anvil-data)">① 동적 검색 — ch09 와 같은 5조건</h2>
+        <code class="text-xs text-anvil-muted">GET /api/v1/jooq/search</code>
+      </div>
+      <p class="text-xs mb-2" style="color: var(--anvil-muted)">
+        조건은 ch09 와 동일. jOOQ 의 <code>DSL.and(conditions)</code> + <code>noCondition()</code>.
+        결과 SQL 이 거의 같아야 정상 — 이 영역에선 두 도구가 막상막하.
+      </p>
+      <form id="searchForm" class="grid grid-cols-1 md:grid-cols-5 gap-2 text-sm">
+        <input name="keyword"     placeholder="keyword" class="field" />
+        <input name="author"      placeholder="author"  class="field" />
+        <input name="from"        type="datetime-local" class="field" />
+        <input name="to"          type="datetime-local" class="field" />
+        <select name="hasComments" class="field">
+          <option value="">hasComments?</option>
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+      </form>
+      <button id="btnSearch" class="bg-anvil-data text-white px-3 py-1 rounded mt-2 text-sm">실행</button>
+      <div class="mt-3">
+        <p class="text-xs" style="color: var(--anvil-muted)">
+          쿼리 <span id="searchCount">-</span> · 소요 <span id="searchMs">-</span>ms · total <span id="searchTotal">-</span>
+        </p>
+        <ol id="searchSql" class="sql-list mt-2"></ol>
+        <ul id="searchData" class="data-list mt-2"></ul>
+      </div>
+    </section>
+
+    <!-- ── 2) 윈도우 함수 랭킹 ────────────────────────────────────────── -->
+    <section class="card p-4 mb-6 sql-box window">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-medium" style="color: var(--anvil-accent)">② 윈도우 함수 — 작성자별 랭킹</h2>
+        <code class="text-xs text-anvil-muted">GET /api/v1/jooq/ranking?topN=2</code>
+      </div>
+      <p class="text-xs mb-2" style="color: var(--anvil-muted)">
+        <code>ROW_NUMBER() OVER (PARTITION BY author ORDER BY created_at DESC)</code> —
+        ch09 QueryDSL 로는 표준 API 미지원 (native query 우회).
+      </p>
+      <label class="text-sm">
+        topN per author:
+        <input id="rankTopN" type="number" value="2" min="1" max="10" class="field inline-block w-20 ml-1" />
+      </label>
+      <button id="btnRanking" class="bg-anvil-accent text-white px-3 py-1 rounded ml-2 text-sm">실행</button>
+      <div class="mt-3">
+        <p class="text-xs" style="color: var(--anvil-muted)">
+          쿼리 <span id="rankCount">-</span> · 소요 <span id="rankMs">-</span>ms
+        </p>
+        <ol id="rankSql" class="sql-list mt-2"></ol>
+        <table id="rankData" class="ranking-table mt-2"></table>
+      </div>
+    </section>
+
+    <!-- ── 3) WITH RECURSIVE 트리 ─────────────────────────────────────── -->
+    <section class="card p-4 mb-6 sql-box recursive">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-medium" style="color: var(--anvil-success)">③ WITH RECURSIVE — 댓글 트리</h2>
+        <code class="text-xs text-anvil-muted">GET /api/v1/jooq/tree/{postId}</code>
+      </div>
+      <p class="text-xs mb-2" style="color: var(--anvil-muted)">
+        depth 정보까지 포함해 한 SQL — ch09 QueryDSL 미지원. 시드의 postId=2 가 깊이 3 트리.
+      </p>
+      <label class="text-sm">
+        postId:
+        <input id="treePostId" type="number" value="2" class="field inline-block w-24 ml-1" />
+      </label>
+      <button id="btnTree" class="bg-anvil-success text-white px-3 py-1 rounded ml-2 text-sm">실행</button>
+      <div class="mt-3">
+        <p class="text-xs" style="color: var(--anvil-muted)">
+          쿼리 <span id="treeCount">-</span> · 소요 <span id="treeMs">-</span>ms · 노드 <span id="treeTotal">-</span> · 최대 깊이 <span id="treeDepth">-</span>
+        </p>
+        <ol id="treeSql" class="sql-list mt-2"></ol>
+        <ul id="treeData" class="tree-list mt-2"></ul>
+      </div>
+    </section>
+
+    <!-- ── 4) ON CONFLICT DO UPDATE ───────────────────────────────────── -->
+    <section class="card p-4 mb-6 sql-box upsert">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-medium" style="color: var(--anvil-data)">④ ON CONFLICT DO UPDATE — upsert</h2>
+        <code class="text-xs text-anvil-muted">POST /api/v1/jooq/upsert</code>
+      </div>
+      <p class="text-xs mb-2" style="color: var(--anvil-muted)">
+        <code>(title, author)</code> unique. 같은 키로 두 번 호출 → 두 번째는 content 만 갱신.
+        JPA 로는 find→update or save 의 두 트랜잭션 + race condition.
+      </p>
+      <form id="upsertForm" class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+        <input name="title"   placeholder="title (같은 값 재전송)" class="field" />
+        <input name="author"  placeholder="author"                class="field" />
+        <input name="content" placeholder="content (이건 갱신됨)"  class="field" />
+      </form>
+      <button id="btnUpsert" class="bg-anvil-data text-white px-3 py-1 rounded mt-2 text-sm">실행</button>
+      <div class="mt-3">
+        <p class="text-xs" style="color: var(--anvil-muted)">
+          쿼리 <span id="upsertCount">-</span> · 소요 <span id="upsertMs">-</span>ms · id <span id="upsertId">-</span>
+        </p>
+        <ol id="upsertSql" class="sql-list mt-2"></ol>
+      </div>
+    </section>
+
+    <!-- ── 5) 진짜 batch INSERT ───────────────────────────────────────── -->
+    <section class="card p-4 mb-6 sql-box bulk">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-medium" style="color: var(--anvil-accent)">⑤ Bulk INSERT — 한 SQL N rows</h2>
+        <code class="text-xs text-anvil-muted">POST /api/v1/jooq/bulk-comments</code>
+      </div>
+      <p class="text-xs mb-2" style="color: var(--anvil-muted)">
+        한 INSERT 문에 N개의 VALUES 그룹. JPA <code>saveAll</code> 은 영속성 컨텍스트 경유 → N INSERT.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+        <label>postId
+          <input id="bulkPostId" type="number" value="1" class="field" />
+        </label>
+        <label>댓글 개수
+          <input id="bulkCount" type="number" value="50" min="1" max="500" class="field" />
+        </label>
+      </div>
+      <button id="btnBulk" class="bg-anvil-accent text-white px-3 py-1 rounded mt-2 text-sm">실행</button>
+      <div class="mt-3">
+        <p class="text-xs" style="color: var(--anvil-muted)">
+          쿼리 <span id="bulkSqlCount">-</span> · 소요 <span id="bulkMs">-</span>ms · INSERT된 행 <span id="bulkRows">-</span>
+        </p>
+        <ol id="bulkSql" class="sql-list mt-2"></ol>
+      </div>
+    </section>
+
+    <!-- ── 비교 표 ─────────────────────────────────────────────────────── -->
+    <section class="card p-4 mb-6" style="border-left: 4px solid var(--anvil-muted)">
+      <h2 class="font-medium mb-2">QueryDSL ↔ jOOQ 비교 (이 챕터의 본진)</h2>
+      <div class="overflow-x-auto">
+        <table class="cmp-table text-sm">
+          <thead>
+            <tr><th>영역</th><th>QueryDSL (ch09)</th><th>jOOQ (ch09b)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>동적 검색</td><td>BooleanExpression null 무시</td><td>Condition + noCondition()</td></tr>
+            <tr><td>윈도우 함수</td><td class="bad">표준 미지원</td><td class="good">일급 (rowNumber/rank/lag/lead)</td></tr>
+            <tr><td>WITH RECURSIVE</td><td class="bad">미지원</td><td class="good">withRecursive(...).as(...)</td></tr>
+            <tr><td>ON CONFLICT</td><td class="bad">표준 미지원</td><td class="good">onConflict().doUpdate()</td></tr>
+            <tr><td>벌크 INSERT</td><td class="bad">JPA 영속성 컨텍스트 경유</td><td class="good">한 SQL N rows</td></tr>
+            <tr><td>방향성</td><td>ORM-First (클래스→DB)</td><td>SQL-First (DB→클래스, codegen)</td></tr>
+            <tr><td>러닝커브</td><td>JPA 알면 자연스러움</td><td>SQL 잘 알면 자연스러움</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs mt-3" style="color: var(--anvil-muted)">
+        <b>혼용 권장</b> — 트랜잭션 안에서 도메인 CRUD 는 JPA/QueryDSL, 복잡 집계·통계·upsert 는 jOOQ.
+      </p>
+    </section>
+
+    <section class="card p-3 text-xs" style="color: var(--anvil-muted)">
+      ※ 백엔드 <code>http://localhost:8080</code> · Postgres
+      <code>docker compose -f docker/docker-compose.local.yml up -d postgres</code>
+    </section>
+
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

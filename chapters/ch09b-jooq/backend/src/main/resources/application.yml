@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: ch09b-jooq
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/anvil
+    username: anvil
+    password: anvil
+    driver-class-name: org.postgresql.Driver
+
+  # JPA 자동 설정은 꺼둔다 — 이 챕터는 jOOQ 단독.
+  # Boot 가 starter-jdbc + DataSource 만 알아서 챙기고, jOOQ AutoConfig 가 DSLContext 를 만든다.
+  jooq:
+    sql-dialect: POSTGRES
+
+server:
+  port: 8080
+
+anvil:
+  seed:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    # jOOQ 가 발행하는 SQL — DEBUG 면 콘솔에서도 확인 가능.
+    org.jooq.tools.LoggerListener: DEBUG
