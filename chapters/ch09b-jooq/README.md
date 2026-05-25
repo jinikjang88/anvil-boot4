@@ -141,86 +141,63 @@ python3 -m http.server 5175 --directory chapters/ch09b-jooq/frontend
 7. **`ON CONFLICT (title, author)` 가 안 잡힘**
    conflict 키는 **존재하는 unique constraint 또는 unique index** 와 정확히 매칭되어야 한다. 본 챕터는 `uq_posts_title_author` 를 SchemaInitializer 에서 생성.
 
-## 8. 더 깊이 — Full 모드 (codegen + Flyway) 워크플로
+## 8. 더 깊이 — codegen 직접 체험
 
-본 챕터는 학습 단순화를 위해 Lite. 실무 정공법은:
+이 챕터의 `build.gradle.kts` 에는 `nu.studer.jooq` 플러그인이 **이미 설정**되어 있다.
+단, 기본 빌드에서는 비활성화 (`-Pcodegen` 프로퍼티 필요).
 
-### gradle/libs.versions.toml 추가 (예시)
-```toml
-[versions]
-flyway   = "10.x"
-jooq     = "3.20.x"
+### 직접 돌려보기
 
-[libraries]
-flyway-postgresql        = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
-spring-boot-starter-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq" }
+```bash
+# 1) PostgreSQL 기동
+docker compose -f docker/docker-compose.local.yml up -d postgres
 
-[plugins]
-flyway   = { id = "org.flywaydb.flyway", version.ref = "flyway" }
-jooq-gen = { id = "nu.studer.jooq",       version = "10.x" }
+# 2) 테이블 생성 (SchemaInitializer 가 자동)
+./gradlew :chapters:ch09b-jooq:bootRun
+# Ctrl+C 로 종료
+
+# 3) codegen 실행 (DB 에 테이블이 있는 상태에서)
+./gradlew :chapters:ch09b-jooq:generateJooq -Pcodegen
+
+# 4) 생성 결과 확인
+tree chapters/ch09b-jooq/backend/build/generated/jooq/
+# com/devsmith/anvil/ch09b/generated/
+# ├── tables/
+# │   ├── Comments.java    ← 컬럼 정보가 타입 세이프 필드로
+# │   ├── Posts.java
+# │   └── records/
+# │       ├── CommentsRecord.java  ← POJO
+# │       └── PostsRecord.java
+# ├── Tables.java           ← 자동 생성 테이블 참조
+# ├── Keys.java             ← PK/FK/UK
+# └── Indexes.java
 ```
 
-### chapters/ch09b-jooq/backend/build.gradle.kts (Full 모드 스니펫)
-```kotlin
-plugins {
-    id("anvil.spring-boot-conventions")
-    alias(libs.plugins.flyway)
-    alias(libs.plugins.jooq.gen)
-}
+### Lite vs codegen diff 비교
 
-dependencies {
-    implementation(libs.spring.boot.starter.jooq)
-    runtimeOnly(libs.postgresql.driver)
-    implementation(libs.flyway.postgresql)
-    jooqGenerator(libs.postgresql.driver)
-}
+```bash
+# 수동 정의 (Lite) — 컬럼명 문자열이 단일 출처이긴 하지만 DB 변경 시 수동 동기화 필요
+cat chapters/ch09b-jooq/backend/src/main/java/com/devsmith/anvil/ch09b/schema/Tables.java
 
-flyway {
-    url = "jdbc:postgresql://localhost:5433/anvil"
-    user = "anvil"
-    password = "anvil"
-    locations = arrayOf("filesystem:src/main/resources/db/migration")
-}
-
-jooq {
-    configurations {
-        create("main") {
-            generationTool {
-                jdbc {
-                    driver = "org.postgresql.Driver"
-                    url = "jdbc:postgresql://localhost:5433/anvil"
-                    user = "anvil"
-                    password = "anvil"
-                }
-                generator {
-                    name = "org.jooq.codegen.JavaGenerator"
-                    database {
-                        name = "org.jooq.meta.postgres.PostgresDatabase"
-                        includes = ".*"
-                        excludes = "flyway_schema_history"
-                        inputSchema = "public"
-                    }
-                    target {
-                        packageName = "com.devsmith.anvil.ch09b.jooq"
-                        directory = "build/generated/jooq"
-                    }
-                }
-            }
-        }
-    }
-}
-
-// codegen 은 flyway migrate 후에만 의미가 있다.
-tasks.named("generateJooq") { dependsOn("flywayMigrate") }
+# 자동 생성 (Full) — DB 스키마가 바뀌면 codegen 재실행으로 즉시 반영, 깨진 곳은 컴파일 에러
+cat chapters/ch09b-jooq/backend/build/generated/jooq/com/devsmith/anvil/ch09b/generated/Tables.java
 ```
 
-### src/main/resources/db/migration/V1__init.sql
-```sql
-CREATE TABLE posts (...);
-CREATE TABLE comments (...);
-```
+### Flyway 마이그레이션 파일 (참고용)
 
-→ `./gradlew flywayMigrate generateJooq` 한 번이면 `com.devsmith.anvil.ch09b.jooq.Tables`, `Posts`, `Comments`, `tables.records.PostsRecord` 등 모두 클래스로.
+`src/main/resources/db/migration/V1__init.sql` — 현재 SchemaInitializer 의 DDL 과 동일 내용.
+Full 모드에서는 이 파일이 **스키마의 진실의 원천(Single Source of Truth)**.
+
+운영 워크플로:
+1. `V2__add_views_column.sql` 같이 마이그레이션 추가
+2. `./gradlew flywayMigrate` → DB 에 적용
+3. `./gradlew generateJooq -Pcodegen` → 코드 재생성 (변경된 컬럼이 자동 반영)
+4. 기존 코드에서 삭제된 컬럼 참조 → **컴파일 에러** → 안전하게 수정
+
+Flyway 런타임 적용까지 가려면:
+- `build.gradle.kts` 에 `implementation("org.flywaydb:flyway-database-postgresql")` 추가
+- `application.yml` 에 `spring.flyway.enabled=true`
+- SchemaInitializer 비활성화 (`@ConditionalOnProperty(name = "anvil.schema.manual", havingValue = "true")`)
 
 ### 공식 문서
 - [jOOQ Manual](https://www.jooq.org/doc/latest/manual/)
