@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ch10-transaction — 격리·전파·AOP 함정</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen">
+  <main class="max-w-6xl mx-auto p-6">
+
+    <header class="border-b border-anvil-muted pb-4 mb-6">
+      <p class="text-anvil-muted text-sm">대장간 백엔드 · ch10-transaction</p>
+      <h1 class="text-2xl font-bold text-anvil-accent mt-1">
+        트랜잭션 — 격리·전파·AOP 함정
+      </h1>
+      <p class="text-sm mt-2" style="color: var(--anvil-fg)">
+        은행 송금 도메인 — 잔액 합계가 유지되면 성공, 깨지면 함정에 빠진 것.
+      </p>
+    </header>
+
+    <!-- 계좌 현황 + 리셋 -->
+    <section class="card p-4 mb-6">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-medium" style="color: var(--anvil-data)">계좌 현황</h2>
+        <button id="btnReset" class="bg-anvil-accent text-white px-3 py-1 rounded text-sm">리셋 (3계좌 각 10만원)</button>
+      </div>
+      <div id="accountsBar" class="grid grid-cols-3 gap-2 text-sm"></div>
+      <p class="mt-2 text-xs" style="color: var(--anvil-muted)">
+        잔액 합계: <b id="totalBalance">-</b> · conservation 이 깨지면 <span style="color: var(--anvil-accent)">빨간색</span>
+      </p>
+    </section>
+
+    <!-- 송금 폼 (공통) -->
+    <section class="card p-4 mb-6">
+      <h2 class="font-medium mb-2" style="color: var(--anvil-data)">송금 파라미터</h2>
+      <div class="grid grid-cols-3 gap-2 text-sm">
+        <label>from ID <input id="fromId" type="number" value="1" class="field" /></label>
+        <label>to ID <input id="toId" type="number" value="2" class="field" /></label>
+        <label>금액 <input id="amount" type="number" value="10000" class="field" /></label>
+      </div>
+    </section>
+
+    <!-- 4축 버튼 그리드 -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+      <!-- 격리 -->
+      <div class="card p-4 sql-box isolation">
+        <h2 class="font-medium mb-2" style="color: var(--anvil-success)">① 격리 수준</h2>
+        <div class="flex gap-2 flex-wrap">
+          <button class="scenario-btn" data-url="/isolation/read-committed">READ_COMMITTED</button>
+          <button class="scenario-btn" data-url="/isolation/repeatable-read">REPEATABLE_READ</button>
+          <button class="scenario-btn" data-url="/isolation/serializable">SERIALIZABLE</button>
+        </div>
+      </div>
+
+      <!-- 전파 -->
+      <div class="card p-4 sql-box propagation">
+        <h2 class="font-medium mb-2" style="color: var(--anvil-data)">② 전파 (Propagation)</h2>
+        <div class="flex gap-2 flex-wrap">
+          <button class="scenario-btn no-body" data-url="/propagation/required-rollback">REQUIRED + 롤백</button>
+          <button class="scenario-btn no-body" data-url="/propagation/requires-new-rollback">REQUIRES_NEW + 롤백</button>
+        </div>
+      </div>
+
+      <!-- AOP 함정 -->
+      <div class="card p-4 sql-box trap">
+        <h2 class="font-medium mb-2" style="color: var(--anvil-accent)">③ AOP 함정</h2>
+        <div class="flex gap-2 flex-wrap">
+          <button class="scenario-btn" data-url="/trap/self-invocation">self-invocation</button>
+          <button class="scenario-btn" data-url="/trap/checked-exception">checked exception</button>
+          <button class="scenario-btn" data-url="/trap/checked-exception-fixed">fixed (rollbackFor)</button>
+        </div>
+      </div>
+
+      <!-- 데드락 -->
+      <div class="card p-4 sql-box deadlock">
+        <h2 class="font-medium mb-2" style="color: var(--anvil-accent)">④ 데드락</h2>
+        <button class="scenario-btn" data-url="/deadlock">2스레드 교차 비관적 락</button>
+      </div>
+    </section>
+
+    <!-- 결과 패널 -->
+    <section class="card p-4 mb-6" id="resultPanel" style="display:none">
+      <div class="flex items-baseline justify-between mb-2">
+        <h2 class="font-medium" id="resultScenario"></h2>
+        <span id="resultBadge" class="text-sm font-bold px-2 py-0.5 rounded"></span>
+      </div>
+      <p class="text-sm mb-2" id="resultMessage"></p>
+      <p class="text-xs text-anvil-muted">소요 <span id="resultMs">-</span>ms</p>
+      <div id="resultLogs" class="mt-2 text-xs" style="display:none">
+        <h3 class="font-medium text-anvil-muted mb-1">TxLog (전파 시연)</h3>
+        <ul id="logList" class="data-list"></ul>
+      </div>
+    </section>
+
+    <section class="card p-3 text-xs" style="color: var(--anvil-muted)">
+      ※ 백엔드 <code>http://localhost:8080</code> · Postgres
+      <code>docker compose -f docker/docker-compose.local.yml up -d postgres</code>
+    </section>
+
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

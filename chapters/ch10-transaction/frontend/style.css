@@ -1,0 +1,87 @@
+/* 오행 팔레트 */
+:root {
+  --anvil-bg:      #F5EFE0;
+  --anvil-accent:  #C0392B;
+  --anvil-data:    #1E5F8C;
+  --anvil-success: #3B7A57;
+  --anvil-muted:   #7F8C8D;
+  --anvil-fg:      #2C2C2C;
+}
+
+body {
+  background-color: var(--anvil-bg);
+  color: var(--anvil-fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo",
+               "Segoe UI", Roboto, sans-serif;
+}
+
+.text-anvil-accent  { color: var(--anvil-accent); }
+.text-anvil-data    { color: var(--anvil-data); }
+.text-anvil-success { color: var(--anvil-success); }
+.text-anvil-muted   { color: var(--anvil-muted); }
+.bg-anvil-accent    { background-color: var(--anvil-accent); }
+.bg-anvil-data      { background-color: var(--anvil-data); }
+.bg-anvil-success   { background-color: var(--anvil-success); }
+.border-anvil-muted { border-color: var(--anvil-muted); }
+
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.field {
+  width: 100%;
+  border: 1px solid var(--anvil-muted);
+  padding: 0.4rem 0.5rem;
+  background: #fff;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+}
+
+.sql-box.isolation   { border-left: 4px solid var(--anvil-success); }
+.sql-box.propagation { border-left: 4px solid var(--anvil-data); }
+.sql-box.trap        { border-left: 4px solid var(--anvil-accent); }
+.sql-box.deadlock    { border-left: 4px solid var(--anvil-accent); }
+
+.scenario-btn {
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: 1px solid var(--anvil-muted);
+  background: #fff;
+  cursor: pointer;
+}
+.scenario-btn:hover { background: #F0ECE0; }
+
+.account-card {
+  padding: 0.5rem;
+  border: 1px solid var(--anvil-muted);
+  border-radius: 0.25rem;
+  text-align: center;
+}
+.account-card .name { font-weight: 600; font-size: 0.85rem; }
+.account-card .balance { font-size: 1.2rem; font-weight: 700; color: var(--anvil-data); margin-top: 0.2rem; }
+.account-card .version { font-size: 0.7rem; color: var(--anvil-muted); }
+
+.data-list {
+  font-size: 0.78rem;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #EEE;
+  border-radius: 0.25rem;
+}
+.data-list li {
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid #EEE;
+}
+.data-list li:last-child { border-bottom: 0; }
+
+.badge-ok   { background: var(--anvil-success); color: #fff; }
+.badge-fail { background: var(--anvil-accent);  color: #fff; }
+.badge-warn { background: #E67E22;             color: #fff; }
+
+.conservation-ok   { color: var(--anvil-success); font-weight: 700; }
+.conservation-fail { color: var(--anvil-accent);  font-weight: 700; }
